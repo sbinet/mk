@@ -13,7 +13,7 @@ const tmpl = `
 ## simple makefile to log workflow
 .PHONY: all test clean build
 
-GOFLAGS := $(GOFLAGS:-v)
+GOFLAGS ?= $(GOFLAGS:-v)
 
 all: build test
 	@echo "## bye."
@@ -53,11 +53,9 @@ func main() {
 	if *g_race {
 		goflags += " -race"
 	}
-	cmdenv := os.Environ()
-	cmdenv = append(cmdenv, "GOFLAGS="+goflags)
+	os.Setenv("GOFLAGS", goflags)
 
 	cmd := exec.Command("make", cmdargs...)
-	cmd.Env = cmdenv
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr

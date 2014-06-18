@@ -55,6 +55,8 @@ func main() {
 	}
 	os.Setenv("GOFLAGS", goflags)
 
+	cmdargs = append(cmdargs, flag.Args()...)
+
 	cmd := exec.Command("make", cmdargs...)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout

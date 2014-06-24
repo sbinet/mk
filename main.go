@@ -47,10 +47,26 @@ var (
 	g_makefile = flag.String("f", mkfname, "alternate Makefile")
 	g_race     = flag.Bool("race", false, "enable build with race detector")
 	g_compiler = flag.String("compiler", "gc", "go compiler to use (gc,gccgo,llgo)")
+
+	g_show    = flag.Bool("show", false, "dump the Makefile we use on STDOUT")
+	g_version = flag.Bool("version", false, "dump mk's version")
 )
 
 func main() {
 	flag.Parse()
+
+	if *g_version {
+		fmt.Fprintf(os.Stdout, "mk version: %v\n", Version)
+		os.Exit(0)
+	}
+
+	// detect if there is a Makefile in the current directory.
+	// use it instead (if user didn't specify an alternate Makefile)
+	if *g_makefile == mkfname {
+		if _, err := os.Stat("Makefile"); err == nil {
+			*g_makefile = "Makefile"
+		}
+	}
 
 	rc := run()
 	os.Exit(rc)
@@ -58,6 +74,7 @@ func main() {
 
 func run() int {
 	var err error
+
 	if *g_makefile == mkfname {
 		err = ioutil.WriteFile(*g_makefile, []byte(tmpl), 0644)
 		defer os.Remove(*g_makefile)
@@ -65,6 +82,17 @@ func run() int {
 			fmt.Fprintf(os.Stderr, "**error** creating file [%s]: %v\n", *g_makefile, err)
 			return 1
 		}
+	}
+
+	if *g_show {
+		mkfile, err := os.Open(*g_makefile)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "**error** opening file [%s]: %v\n", *g_makefile, err)
+			return 1
+		}
+		defer mkfile.Close()
+		_, err = io.Copy(os.Stdout, mkfile)
+		return 0
 	}
 
 	cmdargs := make([]string, 0, flag.NArg())

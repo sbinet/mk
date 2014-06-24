@@ -53,6 +53,24 @@ var (
 )
 
 func main() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, `mk - a simple makefile generator for Go packages.
+
+Usage of mk:
+
+$ mk [options] [target-name]
+
+Examples:
+
+$ mk
+$ mk -f Makefile-my.mk
+$ mk install
+
+Options:
+`)
+		flag.PrintDefaults()
+	}
+
 	flag.Parse()
 
 	if *g_version {

@@ -48,8 +48,9 @@ var (
 	g_race     = flag.Bool("race", false, "enable build with race detector")
 	g_compiler = flag.String("compiler", "gc", "go compiler to use (gc,gccgo,llgo)")
 
-	g_show    = flag.Bool("show", false, "dump the Makefile we use on STDOUT")
-	g_version = flag.Bool("version", false, "dump mk's version")
+	g_show         = flag.Bool("show", false, "dump the Makefile mk will use on STDOUT")
+	g_show_default = flag.Bool("show-default", false, "dump the default Makefile-mk on STDOUT")
+	g_version      = flag.Bool("version", false, "dump mk's version")
 )
 
 func main() {
@@ -75,6 +76,11 @@ Options:
 
 	if *g_version {
 		fmt.Fprintf(os.Stdout, "mk version: %v\n", Version)
+		os.Exit(0)
+	}
+
+	if *g_show_default {
+		fmt.Fprintf(os.Stdout, tmpl)
 		os.Exit(0)
 	}
 

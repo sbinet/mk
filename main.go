@@ -34,6 +34,9 @@ install:
 test: install
 	@go test $(GOFLAGS) ./...
 
+bench: install
+	@go test -bench=. $(GOFLAGS) ./...
+
 clean:
 	@go clean $(GOFLAGS) -i ./...
 

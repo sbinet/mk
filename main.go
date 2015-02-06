@@ -31,6 +31,9 @@ build:
 install:
 	@go get $(GOFLAGS) ./...
 
+gen:
+	@go generate $(GOFLAGS) ./...
+
 test: install
 	@go test $(GOFLAGS) ./...
 

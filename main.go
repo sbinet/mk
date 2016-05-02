@@ -49,14 +49,14 @@ clean:
 const mkfname = ".makefile-mkgo.mk"
 
 var (
-	g_verbose  = flag.Bool("v", false, "enable verbose output")
-	g_makefile = flag.String("f", mkfname, "alternate Makefile")
-	g_race     = flag.Bool("race", false, "enable build with race detector")
-	g_compiler = flag.String("compiler", "gc", "go compiler to use (gc,gccgo,llgo)")
+	verbose  = flag.Bool("v", false, "enable verbose output")
+	makefile = flag.String("f", mkfname, "alternate Makefile")
+	race     = flag.Bool("race", false, "enable build with race detector")
+	compiler = flag.String("compiler", "gc", "go compiler to use (gc,gccgo,llgo)")
 
-	g_show         = flag.Bool("show", false, "dump the Makefile mk will use on STDOUT")
-	g_show_default = flag.Bool("show-default", false, "dump the default Makefile-mk on STDOUT")
-	g_version      = flag.Bool("version", false, "dump mk's version")
+	show        = flag.Bool("show", false, "dump the Makefile mk will use on STDOUT")
+	showDefault = flag.Bool("show-default", false, "dump the default Makefile-mk on STDOUT")
+	version     = flag.Bool("version", false, "dump mk's version")
 )
 
 func main() {
@@ -80,21 +80,21 @@ Options:
 
 	flag.Parse()
 
-	if *g_version {
+	if *version {
 		fmt.Fprintf(os.Stdout, "mk version: %v\n", Version)
 		os.Exit(0)
 	}
 
-	if *g_show_default {
+	if *showDefault {
 		fmt.Fprintf(os.Stdout, tmpl)
 		os.Exit(0)
 	}
 
 	// detect if there is a Makefile in the current directory.
 	// use it instead (if user didn't specify an alternate Makefile)
-	if *g_makefile == mkfname {
+	if *makefile == mkfname {
 		if _, err := os.Stat("Makefile"); err == nil {
-			*g_makefile = "Makefile"
+			*makefile = "Makefile"
 		}
 	}
 
@@ -105,19 +105,19 @@ Options:
 func run() int {
 	var err error
 
-	if *g_makefile == mkfname {
-		err = ioutil.WriteFile(*g_makefile, []byte(tmpl), 0644)
-		defer os.Remove(*g_makefile)
+	if *makefile == mkfname {
+		err = ioutil.WriteFile(*makefile, []byte(tmpl), 0644)
+		defer os.Remove(*makefile)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "**error** creating file [%s]: %v\n", *g_makefile, err)
+			fmt.Fprintf(os.Stderr, "**error** creating file [%s]: %v\n", *makefile, err)
 			return 1
 		}
 	}
 
-	if *g_show {
-		mkfile, err := os.Open(*g_makefile)
+	if *show {
+		mkfile, err := os.Open(*makefile)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "**error** opening file [%s]: %v\n", *g_makefile, err)
+			fmt.Fprintf(os.Stderr, "**error** opening file [%s]: %v\n", *makefile, err)
 			return 1
 		}
 		defer mkfile.Close()
@@ -126,15 +126,15 @@ func run() int {
 	}
 
 	cmdargs := make([]string, 0, flag.NArg())
-	cmdargs = append(cmdargs, "-f", *g_makefile)
+	cmdargs = append(cmdargs, "-f", *makefile)
 	goflags := os.Getenv("GOFLAGS")
-	if *g_verbose {
+	if *verbose {
 		goflags += " -v"
 	}
-	if *g_race {
+	if *race {
 		goflags += " -race"
 	}
-	goflags += fmt.Sprintf(" -compiler=%s", *g_compiler)
+	goflags += fmt.Sprintf(" -compiler=%s", *compiler)
 
 	os.Setenv("GOFLAGS", goflags)
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -81,8 +82,11 @@ Options:
 
 	flag.Parse()
 
+	log.SetPrefix("mk: ")
+	log.SetFlags(0)
+
 	if *version {
-		fmt.Fprintf(os.Stdout, "mk version: %v\n", Version)
+		log.Printf("version: %v\n", Version)
 		os.Exit(0)
 	}
 
@@ -110,7 +114,7 @@ func run() int {
 		err = ioutil.WriteFile(*makefile, []byte(tmpl), 0644)
 		defer os.Remove(*makefile)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "**error** creating file [%s]: %v\n", *makefile, err)
+			log.Printf("error creating file [%s]: %v\n", *makefile, err)
 			return 1
 		}
 		go func() {
@@ -125,7 +129,7 @@ func run() int {
 	if *show {
 		mkfile, err := os.Open(*makefile)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "**error** opening file [%s]: %v\n", *makefile, err)
+			log.Printf("error opening file [%s]: %v\n", *makefile, err)
 			return 1
 		}
 		defer mkfile.Close()
@@ -154,7 +158,7 @@ func run() int {
 	cmd.Stderr = os.Stderr
 	err = cmd.Run()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "**error** running make %s: %v\n",
+		log.Printf("error running make %s: %v\n",
 			strings.Join(cmdargs, " "),
 			err,
 		)

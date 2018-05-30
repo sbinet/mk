@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"os/signal"
 	"strings"
 )
 
@@ -112,6 +113,13 @@ func run() int {
 			fmt.Fprintf(os.Stderr, "**error** creating file [%s]: %v\n", *makefile, err)
 			return 1
 		}
+		go func() {
+			c := make(chan os.Signal, 1)
+			signal.Notify(c, os.Interrupt)
+
+			<-c
+			os.Remove(mkfname)
+		}()
 	}
 
 	if *show {

@@ -12,7 +12,7 @@ import (
 // FIXME: use -ldflags to automatically get the Version ?
 // go build -ldflags "-X main.Version 0.1.`date -u +.%Y%m%d%.H%M%S`" main.go
 
-const Version = "0.4.0"
+const Version = "0.5.0"
 
 var (
 	verbose  = flag.Bool("v", false, "enable verbose output")
@@ -72,7 +72,7 @@ func run() int {
 
 	switch flag.NArg() {
 	case 0:
-		cmdargs = append(cmdargs, "get", "-v", "./...")
+		cmdargs = append(cmdargs, "install", "-v", "./...")
 	default:
 		cmdargs = append(cmdargs, flag.Args()...)
 	}
